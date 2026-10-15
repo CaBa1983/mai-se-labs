@@ -1,0 +1,6 @@
+# Настройки проекта
+project = mai-se-labs
+languages = cpp
+line_endings = crlf
+encoding = utf-8
+version = 0.1.0
