@@ -1,0 +1,18 @@
+# Конфигурация Doxygen для проекта textstats.
+# Генерация: doxygen Doxyfile  → результат в docs/html
+
+PROJECT_NAME           = "textstats"
+PROJECT_BRIEF          = "Подсчёт частот слов в текстовом файле"
+OUTPUT_DIRECTORY       = docs
+INPUT                  = src README.md
+FILE_PATTERNS          = *.h *.cpp *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+EXTRACT_ALL            = YES
+EXTRACT_STATIC         = YES
+GENERATE_LATEX         = NO
+GENERATE_TREEVIEW      = YES
+HTML_OUTPUT            = html
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
+SOURCE_BROWSER         = YES

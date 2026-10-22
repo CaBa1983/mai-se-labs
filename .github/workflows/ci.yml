@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Сборка
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Установка инструментов
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+      - name: Кэш GoogleTest
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: gtest-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+      - name: Конфигурация
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Сборка
+        run: cmake --build build -j"$(nproc)"
+      - name: Артефакт — исполняемый файл
+        uses: actions/upload-artifact@v4
+        with:
+          name: textstats
+          path: build/textstats
+
+  test:
+    name: Тесты
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Установка инструментов
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+      - name: Кэш GoogleTest
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: gtest-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+      - name: Конфигурация
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Сборка
+        run: cmake --build build -j"$(nproc)"
+      - name: Прогон тестов
+        run: ctest --test-dir build --output-on-failure
+
+  lint:
+    name: Проверка стиля
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Установка инструментов
+        run: sudo apt-get update && sudo apt-get install -y clang-format cppcheck
+      - name: Проверка форматирования
+        run: clang-format --dry-run --Werror src/*.cpp src/*.h tests/*.cpp
+      - name: Статический анализ
+        run: cppcheck --error-exitcode=1 --enable=warning,performance,portability src tests
+
+  docs:
+    name: Документация
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Установка Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen
+      - name: Генерация документации
+        run: doxygen Doxyfile
+      - name: Загрузка артефакта страниц
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/html
+      - name: Публикация на GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
