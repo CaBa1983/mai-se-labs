@@ -53,3 +53,11 @@ TEST(TextStats, TopWordsRespectsLimit) {
         textstats::TopWords(CountFrom("one two three four five"), 2);
     EXPECT_EQ(rows.size(), 2u);
 }
+
+TEST(TextStats, FiltersShortWords) {
+    const textstats::Counts counts = CountFrom("a cat dog");
+    const textstats::Counts filtered = textstats::FilterByLength(counts, 3);
+    ASSERT_EQ(filtered.size(), 2u);
+    EXPECT_EQ(filtered.at("cat"), 1u);
+    EXPECT_EQ(filtered.count("a"), 0u);
+}

@@ -62,6 +62,16 @@ std::vector<WordCount> TopWords(const std::map<std::string, std::size_t>& counts
     return rows;
 }
 
+Counts FilterByLength(const Counts& counts, std::size_t min_length) {
+    Counts filtered;
+    for (const auto& entry : counts) {
+        if (entry.first.size() >= min_length) {
+            filtered.insert(entry);
+        }
+    }
+    return filtered;
+}
+
 std::map<std::string, std::size_t> CountWordsInFile(const std::string& path) {
     std::ifstream input(path);
     if (!input.is_open()) {
