@@ -39,8 +39,7 @@ TEST(TextStats, ThrowsOnMissingFile) {
 }
 
 TEST(TextStats, TopWordsSortedByCountThenAlphabet) {
-    const std::vector<textstats::WordCount> rows =
-        textstats::TopWords(CountFrom("b a b c a b"), 3);
+    const std::vector<textstats::WordCount> rows = textstats::TopWords(CountFrom("b a b c a b"), 3);
     ASSERT_EQ(rows.size(), 3u);
     EXPECT_EQ(rows[0].first, "b");
     EXPECT_EQ(rows[0].second, 3u);
