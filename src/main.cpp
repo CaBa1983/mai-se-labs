@@ -10,7 +10,7 @@ namespace {
 
 /// Печатает подсказку по запуску программы.
 void PrintUsage() {
-    std::cout << "usage: textstats <file> [--top N]\n";
+    std::cout << "usage: textstats <file> [--top N] [--min-length N]\n";
 }
 
 /// Разбирает строку как неотрицательное число.
@@ -28,12 +28,15 @@ std::size_t ParseCount(const std::string& text) {
 int main(int argc, char** argv) {
     std::string path;
     std::size_t top = 10;
+    std::size_t min_length = 0;
 
     try {
         for (int index = 1; index < argc; ++index) {
             const std::string argument = argv[index];
             if (argument == "--top" && index + 1 < argc) {
                 top = ParseCount(argv[++index]);
+            } else if (argument == "--min-length" && index + 1 < argc) {
+                min_length = ParseCount(argv[++index]);
             } else if (path.empty()) {
                 path = argument;
             } else {
@@ -53,7 +56,10 @@ int main(int argc, char** argv) {
     }
 
     try {
-        const std::map<std::string, std::size_t> counts = textstats::CountWordsInFile(path);
+        textstats::Counts counts = textstats::CountWordsInFile(path);
+        if (min_length > 0) {
+            counts = textstats::FilterByLength(counts, min_length);
+        }
         for (const textstats::WordCount& row : textstats::TopWords(counts, top)) {
             std::cout << row.first << ": " << row.second << '\n';
         }
