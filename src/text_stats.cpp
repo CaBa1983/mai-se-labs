@@ -29,7 +29,7 @@ std::string Normalize(const std::string& word) {
     result.reserve(end - begin);
     for (std::size_t index = begin; index < end; ++index) {
         const unsigned char symbol = static_cast<unsigned char>(word[index]);
-        result.push_back(static_cast<char>(std::tolower(symbol)));
+        result.push_back(static_cast<char>(symbol));
     }
     return result;
 }
